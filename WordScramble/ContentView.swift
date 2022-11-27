@@ -8,14 +8,35 @@
 import SwiftUI
 
 struct ContentView: View {
+    let people = ["Finn", "Leia", "Luke", "Rey"]
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+        List {
+            Text("Static Row 1")
+            Section {
+                ForEach(people, id: \.self) {
+                    Text($0)
+                }
+            } header: {
+                Text("Section Heading")
+                    .font(.headline)
+            }
+            
+        
+        
+        Text("Static Row 2")
+            
+//            Text("Static row 1")
+//            Text("Static row 2")
+//
+//            ForEach(0..<5) {
+//                Text("Dynamic row \($0)")
+//            }
+//
+//            Text("Static row 3")
+//            Text("Static row 4")
         }
-        .padding()
+        .listStyle(.grouped)
     }
 }
 
