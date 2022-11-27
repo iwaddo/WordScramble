@@ -26,6 +26,16 @@ struct ContentView: View {
 //        }
     }
 
+    func test() {
+        let word = "swift"
+        let checker = UITextChecker()
+        
+        let range = NSRange(location: 0, length: word.utf16.count)
+        let missspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
+        
+        let allGood = missspelledRange.location == NSNotFound
+    }
+    
     
     
     
