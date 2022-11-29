@@ -8,44 +8,58 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var useWords = [String]()
+    @State private var rootWord = ""
+    @State private var newWord = ""
     
     var body: some View {
-        Text("Hello World")
-        
-        
-        
-        
-        
-//        VStack {
-//            Text("Hello World")
-//
-//            let input = "a b c"
-//            let letters = input.components(separatedBy: " ")
-//            Text("Letter 1 is a \(letters[1])")
-//            Text("Hello World 2")
-//        }
-    }
-
-    func test() {
-        let word = "swift"
-        let checker = UITextChecker()
-        
-        let range = NSRange(location: 0, length: word.utf16.count)
-        let missspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
-        
-        let allGood = missspelledRange.location == NSNotFound
+        NavigationView {
+            List {
+                Section {
+                    TextField("Enter your word", text: $newWord)
+                        .autocapitalization(.none)
+                }
+                
+                Section {
+                    ForEach(useWords, id: \.self) { word in
+                        HStack {
+                            Image(systemName: "\(word.count).circle")
+                            Text(word)
+                        }
+                    }
+                }
+            }
+            .navigationTitle(rootWord)
+            .onSubmit(addNewWord)
+            .onAppear(perform: startGame)
+            
+        }
     }
     
+    func addNewWord() {
+        let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        guard answer.count > 0 else { return }
+        
+        // extra validation to come
+        
+        withAnimation {
+            useWords.insert(answer, at: 0)
+        }
+        newWord = " "
+    }
     
+    func startGame() {
+        if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: "txt") {
+            if let startWords = try? String(contentsOf: startWordsURL) {
+                let allWords = startWords.components(separatedBy: "\n")
+                rootWord = allWords.randomElement() ?? "Silkword"
+                return
+            }
+        }
+        
+        fatalError("Coud not load start.txt from bundle.")
+    }
     
-    
-//    func loadFile() {
-//        if let fileURL = Bundle.main.url(forResource: "some-file", withExtension: "txt") {
-//            if let fileContents = try? String(contentsOf: fileURL) {
-//                fileContents
-//            }
-//        }
-//    }
 }
 
 struct ContentView_Previews: PreviewProvider {
