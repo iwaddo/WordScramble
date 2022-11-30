@@ -16,6 +16,8 @@ struct ContentView: View {
     @State private var errorMessage = ""
     @State private var showingError = false
     
+    @State private var gameScore = 0
+    
     var body: some View {
         NavigationView {
             List {
@@ -25,6 +27,19 @@ struct ContentView: View {
                 }
                 
                 Section {
+                    if usedWords.count > 0 {
+                        HStack {
+                            Text("Words used: \(usedWords.count)")
+                            Spacer()
+                            Text("Game Score: \(gameScore)")
+                        }
+                    }
+                    
+                }
+                
+                
+                
+                Section {
                     ForEach(usedWords, id: \.self) { word in
                         HStack {
                             Image(systemName: "\(word.count).circle")
@@ -32,6 +47,10 @@ struct ContentView: View {
                         }
                     }
                 }
+                
+                
+                
+                
             }
             .navigationTitle(rootWord)
             .onSubmit(addNewWord)
@@ -41,7 +60,9 @@ struct ContentView: View {
             } message: {
                 Text(errorMessage)
             }
-            
+            .toolbar {
+                Button("Restart", action: startGame)
+            }
         }
     }
     
@@ -64,7 +85,12 @@ struct ContentView: View {
             return
         }
         
+        guard isShort(word: answer) else {
+            wordError(title: "Word is too short", message: "Try using at least three letters")
+            return
+        }
         
+        gameScore += answer.count
         withAnimation {
             usedWords.insert(answer, at: 0)
         }
@@ -72,6 +98,13 @@ struct ContentView: View {
     }
     
     func startGame() {
+// clear the variables, required to enable the restart button
+        usedWords = [String]()
+        rootWord = ""
+        newWord = ""
+        gameScore = 0
+
+
         // 1. Find the URL for start.txt in our app bundle
         if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: "txt") {
             // 2. Load start.txt into a string
@@ -115,6 +148,14 @@ struct ContentView: View {
         let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
         
         return misspelledRange.location == NSNotFound
+    }
+    
+    func isShort(word: String) -> Bool {
+        if word.count < 3 {
+            return false
+        }
+        
+        return true
     }
     
     func wordError(title: String, message: String) {
